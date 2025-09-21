@@ -1,9 +1,8 @@
 import { useDroppable } from "@dnd-kit/react";
 import type { CardType } from "../../../application/types/CardType";
 import { Card } from "../card/Card";
-import { PlusCircle } from "lucide-react";
+import { CalendarIcon, Plus, Trash } from "lucide-react";
 import { useSectionContext } from "@/application/hooks/use-section-context";
-import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -18,10 +17,18 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { useState } from "react";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { Calendar } from "@/components/ui/calendar";
+import dayjs from "dayjs";
 
 const formSchema = z.object({
     titulo: z.string({ error: 'O titulo é obrigatório!' }).min(1, 'O titulo é obrigatório!'),
     descricao: z.string({ error: 'A descrição da tarefa é obrigatório!' }).min(1, 'A descrição é obrigatória!'),
+    data_tarefa: z.date(),
+    hora_tarefa: z.string('Formato de hora inválido'),
 });
 
 type FormSchemaType = z.infer<typeof formSchema>;
@@ -44,6 +51,7 @@ export function Section({
 
     const {
         addTask,
+        removeSection,
     } = useSectionContext();
 
     const { ref } = useDroppable({
@@ -60,12 +68,29 @@ export function Section({
     function onSubmitForm({
         titulo,
         descricao,
+        data_tarefa,
+        hora_tarefa
     }: FormSchemaType) {
+
+        if (!data_tarefa || !hora_tarefa) {
+            console.error('Data ou hora não informada');
+            return;
+        }
+
+        const dataCompleta = dayjs(data_tarefa)
+            .set('hour', parseInt(hora_tarefa.split(':')[0]))
+            .set('minute', parseInt(hora_tarefa.split(':')[1]))
+            .set('second', 0);
+
+        const dataFormatada = dataCompleta.format('DD/MM/YYYY HH:mm:ss');
+
         addTask({
             section_id: id,
             titulo: titulo,
-            descricao: descricao
+            descricao: descricao,
+            expira_em: dataFormatada,
         });
+
         setOpen(false);
         resetFormulario();
     }
@@ -73,9 +98,45 @@ export function Section({
     return (
         <div
             ref={ref}
-            className={'flex flex-col p-3 rounded-md bg-gray-800 min-h-[600px] transition-colors'}
+            className={'flex flex-col p-3 rounded-md bg-zinc-200 min-h-[600px] min-w-[300px] transition-colors'}
         >
-            <h3 className='text-md text-gray-400 font-bold uppercase mb-2'>{title}</h3>
+            <div className="flex w-full items-center justify-between gap-3 flex-wrap">
+                <h3 className='text-md text-zinc-900 font-bold uppercase mb-2'>{title} ({cards.length})</h3>
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <button className='flex transition-colors rounded-sm text-sm p-2 items-center justify-center gap-1 text-zinc-200 hover:bg-red-400 cursor-pointer'>
+                            <Trash size={16} />
+                        </button>
+                    </DialogTrigger>
+                    <DialogContent className="bg-zinc-800 border-zinc-700 text-zinc-700 sm:max-w-[425px]">
+                        <Form {...form}>
+                            <form onSubmit={form.handleSubmit(onSubmitForm)}>
+                                <DialogHeader>
+                                    <DialogTitle className="text-zinc-700">Confirmação</DialogTitle>
+                                    <DialogDescription className="text-zinc-300">
+                                        Tem certeza que deseja apagar este board com todas as tarefas nele?
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <DialogFooter className="flex flex-col gap-2 sm:flex-row">
+                                    <DialogClose asChild>
+                                        <button
+                                            onClick={() => {
+                                                resetFormulario();
+                                            }}
+                                            className='flex transition-colors rounded-sm text-sm p-2 items-center justify-center gap-1 text-white cursor-pointer'
+                                        >
+                                            Cancelar
+                                        </button>
+                                    </DialogClose>
+                                    <button onClick={() => removeSection({ id_section: id })} className='flex bg-red-500 transition-colors rounded-sm text-sm p-2 items-center justify-center gap-1 text-zinc-200 hover:bg-red-400 cursor-pointer'>
+                                        Apagar
+                                    </button>
+                                </DialogFooter>
+                            </form>
+                        </Form>
+                    </DialogContent>
+                </Dialog>
+            </div>
             <div className="flex-1">
                 {cards.map((card) => (
                     <Card
@@ -84,29 +145,38 @@ export function Section({
                     />
                 ))}
             </div>
-            <Drawer direction="right" open={open} onOpenChange={setOpen}>
-                <DrawerTrigger>
-                    <button className='flex mt-3 transition-colors rounded-sm text-sm p-2 items-center justify-center gap-1 text-white bg-emerald-500 hover:bg-emerald-400 cursor-pointer'>
-                        <PlusCircle size={16} />
-                        Criar Novo
+            <Dialog open={open} onOpenChange={setOpen}>
+                <DialogTrigger asChild>
+                    <button className='flex mt-3 transition-colors rounded-sm text-sm p-2 items-center justify-center gap-1 text-zinc-900 bg-emerald-500 hover:bg-emerald-400 cursor-pointer'>
+                        <Plus size={16} />
+                        Nova Tarefa
                     </button>
-                </DrawerTrigger>
-                <DrawerContent className="bg-gray-800 border-l-gray-800">
+                </DialogTrigger>
+                <DialogContent className="bg-zinc-100 border-zinc-700 text-zinc-700 sm:max-w-[425px]">
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmitForm)}>
-                            <DrawerHeader>
-                                <DrawerTitle className="text-gray-100">Criar nova task</DrawerTitle>
-                                <DrawerDescription className="text-gray-300">Use este menu para criar uma nova task</DrawerDescription>
+                            <DialogHeader>
+                                <DialogTitle className="text-zinc-700">Criar nova task</DialogTitle>
+                                <DialogDescription className="text-zinc-700">
+                                    Use este menu para criar uma nova task
+                                </DialogDescription>
+                            </DialogHeader>
+
+                            <div className="grid gap-4 py-4">
                                 <FormField
                                     control={form.control}
                                     name="titulo"
                                     render={({ field }) => (
-                                        <FormItem className="mt-3">
-                                            <FormLabel className="text-gray-100">Titulo</FormLabel>
+                                        <FormItem>
+                                            <FormLabel className="text-zinc-700">Titulo</FormLabel>
                                             <FormControl>
-                                                <Input className="text-gray-100" placeholder="Ex.: Titulo da tarefa" {...field} />
+                                                <Input
+                                                    className="text-zinc-700 bg-zinc-100 border-zinc-600"
+                                                    placeholder="Ex.: Titulo da tarefa"
+                                                    {...field}
+                                                />
                                             </FormControl>
-                                            <FormDescription className="text-gray-100">
+                                            <FormDescription className="text-zinc-400">
                                                 Este é o titulo da sua tarefa
                                             </FormDescription>
                                             <FormMessage />
@@ -117,42 +187,101 @@ export function Section({
                                     control={form.control}
                                     name="descricao"
                                     render={({ field }) => (
-                                        <FormItem className="mt-3">
-                                            <FormLabel className="text-gray-100">Descricao</FormLabel>
+                                        <FormItem>
+                                            <FormLabel className="text-zinc-700">Descrição</FormLabel>
                                             <FormControl>
-                                                <Input className="text-gray-100" placeholder="Ex.: Descrição da tarefa" {...field} />
+                                                <Input
+                                                    className="text-zinc-700 bg-zinc-100 border-zinc-600"
+                                                    placeholder="Ex.: Descrição da tarefa"
+                                                    {...field}
+                                                />
                                             </FormControl>
-                                            <FormDescription className="text-gray-100">
-                                                Este é a descrição da sua tarefa
+                                            <FormDescription className="text-zinc-400">
+                                                Esta é a descrição da sua tarefa
                                             </FormDescription>
                                             <FormMessage />
                                         </FormItem>
                                     )}
                                 />
-                            </DrawerHeader>
-                            <DrawerFooter>
-                                <button
-                                    type="submit"
-                                    className='flex mt-3 transition-colors w-full rounded-sm text-sm p-2 items-center justify-center gap-1 text-white bg-emerald-500 hover:bg-emerald-400 cursor-pointer'
-                                >
-                                    <PlusCircle size={16} />
-                                    Adicionar
-                                </button>
-                                <DrawerClose asChild>
+                                <FormField
+                                    control={form.control}
+                                    name="data_tarefa"
+                                    render={({ field }) => (
+                                        <FormItem className="flex flex-col">
+                                            <FormLabel className="w-fit">Data de entrega</FormLabel>
+                                            <div className="flex flex-col gap-3">
+                                                <Popover>
+                                                    <PopoverTrigger asChild>
+                                                        <FormControl>
+                                                            <Button
+                                                                variant={"outline"}
+                                                                className={cn(
+                                                                    "pl-3 text-left font-normal bg-zinc-100 border-[1px] border-zinc-600 hover:bg-zinc-100 hover:text-zinc-700",
+                                                                    !field.value && "text-zinc-700"
+                                                                )}
+                                                            >
+                                                                {field.value ? (
+                                                                    <p className="text-zinc-700">{dayjs(field.value).format('DD/MM/YYYY')}</p>
+                                                                ) : (
+                                                                    <span>Escolha uma data</span>
+                                                                )}
+                                                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                                            </Button>
+                                                        </FormControl>
+                                                    </PopoverTrigger>
+                                                    <PopoverContent className="p-0" align="start">
+                                                        <Calendar
+                                                            mode="single"
+                                                            selected={field.value}
+                                                            onSelect={field.onChange}
+                                                            disabled={(date) =>
+                                                                dayjs(date).isBefore(dayjs(), 'day')
+                                                            }
+                                                            captionLayout="dropdown"
+                                                        />
+                                                    </PopoverContent>
+                                                </Popover>
+                                                <FormLabel className="w-fit">Hora de entrega</FormLabel>
+                                                <Input
+                                                    type="time"
+                                                    id="time-picker"
+                                                    step="1"
+                                                    defaultValue="09:00"
+                                                    className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none w-fit"
+                                                    {...form.register('hora_tarefa')}
+                                                />
+                                            </div>
+                                            <FormDescription className="text-zinc-400">
+                                                Esta é a data para finalizar esta tarefa
+                                            </FormDescription>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+
+                            <DialogFooter className="flex flex-col gap-2 sm:flex-row">
+                                <DialogClose asChild>
                                     <button
                                         onClick={() => {
                                             resetFormulario();
                                         }}
-                                        className='flex w-full mt-3 transition-colors rounded-sm text-sm p-2 items-center justify-center gap-1 text-white bg-red-500 hover:bg-red-400 cursor-pointer'
+                                        className='flex transition-colors rounded-sm text-sm p-2 items-center justify-center gap-1 cursor-pointer'
                                     >
                                         Cancelar
                                     </button>
-                                </DrawerClose>
-                            </DrawerFooter>
+                                </DialogClose>
+                                <button
+                                    type="submit"
+                                    className='flex transition-colors rounded-sm text-sm p-2 items-center justify-center gap-1 text-white bg-emerald-500 hover:bg-emerald-400 cursor-pointer'
+                                >
+                                    Adicionar
+                                </button>
+                            </DialogFooter>
                         </form>
                     </Form>
-                </DrawerContent>
-            </Drawer>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

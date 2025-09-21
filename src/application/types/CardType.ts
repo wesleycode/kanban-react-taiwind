@@ -1,7 +1,8 @@
 export type CardType = {
-    id: number;
+    id: string;
     title: string;
     description: string;
     sectionId: string;
+    expires_at: string;
     icon: React.ReactNode;
 }
