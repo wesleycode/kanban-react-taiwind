@@ -11,7 +11,7 @@ import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
 import { WidgetResumoProjeto } from "../components/widgets/widget-resumo-projeto";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { RoutesConstants } from "@/application/constants/RoutesConstants";
 
 const formSectionSchema = z.object({
@@ -27,6 +27,12 @@ export function BoardsPage() {
         handleDragSection,
         sections,
     } = useSectionContext();
+
+    const {
+        id
+    } = useParams();
+
+    console.log(id);
 
     const [open, setOpen] = useState(false);
     const navigate = useNavigate();
@@ -119,7 +125,7 @@ export function BoardsPage() {
                                                         onClick={() => {
                                                             resetFormulario();
                                                         }}
-                                                        className='flex transition-colors rounded-sm text-sm p-2 items-center justify-center gap-1 text-white cursor-pointer'
+                                                        className='flex transition-colors rounded-sm text-sm p-2 items-center justify-center gap-1 text-zinc-800 cursor-pointer'
                                                     >
                                                         Cancelar
                                                     </button>

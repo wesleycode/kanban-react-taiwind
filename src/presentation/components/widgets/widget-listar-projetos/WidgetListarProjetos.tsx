@@ -1,11 +1,10 @@
 import { useListarProjetos } from "@/application/hooks/use-listar-projetos";
-import { Navigate, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import { WidgetLoading } from "../widget-loading/WidgetLoading";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { ExternalLink, Package, Trash } from "lucide-react";
+import { AlertTriangle, ExternalLink, Package, Trash } from "lucide-react";
 import dayjs from "dayjs";
 import { Button } from "@/components/ui/button";
-import { RoutesConstants } from "@/application/constants/RoutesConstants";
 
 export function WidgetListarProjetos() {
 
@@ -45,7 +44,7 @@ export function WidgetListarProjetos() {
                                 <p className="text-zinc-400">{dayjs(projeto.atualizado_em).format('DD/MM/YYYY HH:mm:ss')}</p>
                             </CardContent>
                             <CardFooter className="flex gap-2 justify-between items-center">
-                                <Button onClick={() => navigate(RoutesConstants.BOARDS_PAGE)} className="cursor-pointer bg-emerald-500 hover:bg-emerald-600">
+                                <Button onClick={() => navigate(`/projetos/${projeto.id}`)} className="cursor-pointer bg-emerald-500 hover:bg-emerald-600">
                                     Ver
                                     <ExternalLink />
                                 </Button>
@@ -62,6 +61,12 @@ export function WidgetListarProjetos() {
     }
 
     return (
-        <Navigate to={RoutesConstants.PAGE_NOT_FOUND} />
+        <div className="flex flex-col gap-2 w-full">
+            <div className="flex flex-col gap-2 items-center justify-center min-h-[500px]">
+                <AlertTriangle className="text-emerald-500" size={60} />
+                <h2 className="text-md font-semibold">Sem projetos.</h2>
+                <p className="text-sm text-zinc-500">Tente adicionar um novo projeto.</p>
+            </div>
+        </div>
     );
 }

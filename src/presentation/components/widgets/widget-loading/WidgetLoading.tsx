@@ -1,3 +1,4 @@
+import { Spinner } from '@/components/ui/shadcn-io/spinner';
 import React from 'react';
 
 interface LoadingSpinnerProps {
@@ -23,15 +24,13 @@ export const WidgetLoading: React.FC<LoadingSpinnerProps> = ({
     xl: 'w-16 h-16'
   };
 
-  const containerClasses = fullScreen 
+  const containerClasses = fullScreen
     ? 'fixed inset-0 flex items-center justify-center bg-white bg-opacity-80 z-50'
-    : 'flex flex-col items-center justify-center w-full min-h-[700px]';
+    : 'flex flex-col items-center justify-center w-full min-h-[500px]';
 
   return (
     <div className={`${containerClasses} ${className}`}>
-      <div
-        className={`${sizeClasses[size]} border-1 border-gray-400 border-t-${color} rounded-full animate-spin`}
-      />
+      <Spinner variant={'ring'} />
       {text && (
         <p className="mt-2 text-sm text-gray-600">{text}</p>
       )}

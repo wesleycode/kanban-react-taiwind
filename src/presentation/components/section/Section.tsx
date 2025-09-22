@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
 import dayjs from "dayjs";
+import { Textarea } from "@/components/ui/textarea";
 
 const formSchema = z.object({
     titulo: z.string({ error: 'O titulo é obrigatório!' }).min(1, 'O titulo é obrigatório!'),
@@ -190,8 +191,8 @@ export function Section({
                                         <FormItem>
                                             <FormLabel className="text-zinc-700">Descrição</FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    className="text-zinc-700 bg-zinc-100 border-zinc-600"
+                                                <Textarea
+                                                    className="text-zinc-700 min-h-[200px] bg-zinc-100 border-zinc-600"
                                                     placeholder="Ex.: Descrição da tarefa"
                                                     {...field}
                                                 />
@@ -208,48 +209,54 @@ export function Section({
                                     name="data_tarefa"
                                     render={({ field }) => (
                                         <FormItem className="flex flex-col">
-                                            <FormLabel className="w-fit">Data de entrega</FormLabel>
-                                            <div className="flex flex-col gap-3">
-                                                <Popover>
-                                                    <PopoverTrigger asChild>
-                                                        <FormControl>
-                                                            <Button
-                                                                variant={"outline"}
-                                                                className={cn(
-                                                                    "pl-3 text-left font-normal bg-zinc-100 border-[1px] border-zinc-600 hover:bg-zinc-100 hover:text-zinc-700",
-                                                                    !field.value && "text-zinc-700"
-                                                                )}
-                                                            >
-                                                                {field.value ? (
-                                                                    <p className="text-zinc-700">{dayjs(field.value).format('DD/MM/YYYY')}</p>
-                                                                ) : (
-                                                                    <span>Escolha uma data</span>
-                                                                )}
-                                                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                                            </Button>
-                                                        </FormControl>
-                                                    </PopoverTrigger>
-                                                    <PopoverContent className="p-0" align="start">
-                                                        <Calendar
-                                                            mode="single"
-                                                            selected={field.value}
-                                                            onSelect={field.onChange}
-                                                            disabled={(date) =>
-                                                                dayjs(date).isBefore(dayjs(), 'day')
-                                                            }
-                                                            captionLayout="dropdown"
-                                                        />
-                                                    </PopoverContent>
-                                                </Popover>
+                                            <div className="flex justify-between">
+                                                <FormLabel className="w-fit">Data de entrega</FormLabel>
                                                 <FormLabel className="w-fit">Hora de entrega</FormLabel>
-                                                <Input
-                                                    type="time"
-                                                    id="time-picker"
-                                                    step="1"
-                                                    defaultValue="09:00"
-                                                    className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none w-fit"
-                                                    {...form.register('hora_tarefa')}
-                                                />
+                                            </div>
+                                            <div className="flex flex-wrap items-center justify-between gap-3">
+                                                <div>
+                                                    <Popover>
+                                                        <PopoverTrigger asChild>
+                                                            <FormControl>
+                                                                <Button
+                                                                    variant={"outline"}
+                                                                    className={cn(
+                                                                        "pl-3 text-left font-normal bg-zinc-100 border-[1px] border-zinc-600 hover:bg-zinc-100 hover:text-zinc-700",
+                                                                        !field.value && "text-zinc-700"
+                                                                    )}
+                                                                >
+                                                                    {field.value ? (
+                                                                        <p className="text-zinc-700">{dayjs(field.value).format('DD/MM/YYYY')}</p>
+                                                                    ) : (
+                                                                        <span>Escolha uma data</span>
+                                                                    )}
+                                                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                                                </Button>
+                                                            </FormControl>
+                                                        </PopoverTrigger>
+                                                        <PopoverContent className="p-0" align="start">
+                                                            <Calendar
+                                                                mode="single"
+                                                                selected={field.value}
+                                                                onSelect={field.onChange}
+                                                                disabled={(date) =>
+                                                                    dayjs(date).isBefore(dayjs(), 'day')
+                                                                }
+                                                                captionLayout="dropdown"
+                                                            />
+                                                        </PopoverContent>
+                                                    </Popover>
+                                                </div>
+                                                <div>
+                                                    <Input
+                                                        type="time"
+                                                        id="time-picker"
+                                                        step="1"
+                                                        defaultValue="09:00"
+                                                        className="bg-zinc-100 border-zinc-600 hover:bg-zinc-100 hover:text-zinc-700 appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none w-fit"
+                                                        {...form.register('hora_tarefa')}
+                                                    />
+                                                </div>
                                             </div>
                                             <FormDescription className="text-zinc-400">
                                                 Esta é a data para finalizar esta tarefa

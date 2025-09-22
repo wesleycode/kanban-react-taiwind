@@ -1,5 +1,5 @@
 export type ProjetoType = {
-    id: number;
+    id: string;
     titulo: string;
     descricao: string;
     atualizado_em: string;
