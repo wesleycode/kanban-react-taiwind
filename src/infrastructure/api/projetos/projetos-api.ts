@@ -15,3 +15,24 @@ export async function getListarProjetos() {
 
     return projetosDefault;
 }
+
+export async function getListarProjeto({ id }: { id?: string }) {
+
+    const todosOsProjetos = await getListarProjetos();
+
+    const projetoSelecionado = todosOsProjetos.find((projeto) => projeto.id === id);
+
+    if (projetoSelecionado) {
+        return projetoSelecionado;
+    }
+
+    return null;
+}
+
+export async function deleteProjeto({ id }: { id: string }) {
+
+    await new Promise(resolve => setTimeout(resolve, 3000));
+
+    return true;
+
+}

@@ -13,6 +13,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
 import { WidgetListarSubTasks } from "../widgets/widget-listar-subtasks/WidgetListarSubtasks";
+import { useState } from "react";
 
 const subTaskFormSchema = z.object({
   titulo: z.string(),
@@ -41,9 +42,11 @@ export function Card({
     resolver: zodResolver(subTaskFormSchema),
   });
 
+  const [openDrawer, onOpenDrawer] = useState(false);
+
   return (
-    <Drawer direction="right" >
-      <DrawerTrigger className="bg-zinc-300 hover:bg-zinc-400" asChild>
+    <Drawer direction="right" open={openDrawer} onOpenChange={onOpenDrawer}>
+      <Button onClick={() => onOpenDrawer(true)} className="bg-zinc-300 hover:bg-zinc-400" asChild>
         <div
           ref={ref}
           className={`group relative h-fit p-3 mt-3 rounded-md cursor-move transition-opacity ${isDragging ? 'opacity-50' : 'opacity-100'}`}
@@ -52,10 +55,10 @@ export function Card({
             <div className="flex-1">
               <div className="flex items-center gap-2">
                 <GripVertical size={16} className="text-zinc-500" />
-                <h3 className='uppercase font-bold text-sm'>{title}</h3>
+                <h3 className='uppercase font-bold text-sm'>{title.length > 5 ? title.substring(0, 5).concat('...') : title}</h3>
               </div>
               <div className="flex text-xs flex-col gap-3 ml-6">
-                <p className='text-zinc-600'>{description}</p>
+                <p className='text-zinc-600'>{description.length > 5 ? description.substring(0, 5).concat('...') : description}</p>
                 <div className="flex items-center justify-between gap-3 flex-wrap">
                   <p className="text-zinc-600">Entregar em - {dayjs(expires_at, 'DD/MM/YYYY HH:mm:ss').format('DD/MM/YYYY - HH:mm:ss')}</p>
                   <WidgetTimingSection
@@ -65,13 +68,19 @@ export function Card({
               </div>
             </div>
           </div>
-          <div className="absolute top-2 right-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 pointer-events-none group-hover:pointer-events-auto z-10">
+        </div>
+      </Button>
+      <DrawerContent>
+        <DrawerHeader>
+          <DrawerTitle className="flex items-center justify-between">
+            <h3>{title.toUpperCase()}</h3>
             <Dialog>
               <DialogTrigger asChild>
                 <Button
                   size="sm"
-                  className='text-xs p-2 cursor-pointer text-zinc-700 h-auto bg-zinc-300 hover:bg-zinc-400'
+                  className='text-xs p-2 cursor-pointer text-zinc-100 h-auto bg-red-500 hover:bg-red-600'
                 >
+                  <p>Apagar Tarefa</p>
                   <Trash size={13} />
                 </Button>
               </DialogTrigger>
@@ -102,12 +111,7 @@ export function Card({
                 </DialogFooter>
               </DialogContent>
             </Dialog>
-          </div>
-        </div>
-      </DrawerTrigger>
-      <DrawerContent>
-        <DrawerHeader>
-          <DrawerTitle>{title.toUpperCase()}</DrawerTitle>
+          </DrawerTitle>
           <DrawerDescription>{description}</DrawerDescription>
           <div className="flex flex-col gap-2 flex-wrap my-10 text-zinc-600">
             <div className="flex items-center gap-2">

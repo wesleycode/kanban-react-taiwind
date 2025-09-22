@@ -45,7 +45,8 @@ export function SectionProvider({
 
     const sections_count = sections.length;
 
-    const cards_count = sections.reduce((total, section) => total + section.cards.length, 0);
+    const tasks_active = sections.reduce((total, section) => total + section.cards.length, 0);
+    const tasks_finished = sections[2].cards.length;
 
     function handleDragSection(event: any) {
         if (event.canceled) {
@@ -201,7 +202,8 @@ export function SectionProvider({
             sections: sections,
             handleDragSection: handleDragSection,
             sections_count: sections_count,
-            cards_count: cards_count,
+            tasks_active: tasks_active,
+            tasks_finished: tasks_finished,
         }}>
             {children}
         </SectionContext.Provider>

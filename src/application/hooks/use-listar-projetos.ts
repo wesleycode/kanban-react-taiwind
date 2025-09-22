@@ -4,6 +4,6 @@ import { useQuery } from "@tanstack/react-query";
 export function useListarProjetos() {
     return useQuery({
         queryKey: ['get-listar-projetos'],
-        queryFn: getListarProjetos
+        queryFn: async () => getListarProjetos()
     });
 }

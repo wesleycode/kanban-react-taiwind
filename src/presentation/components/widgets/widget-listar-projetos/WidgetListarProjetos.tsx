@@ -2,18 +2,29 @@ import { useListarProjetos } from "@/application/hooks/use-listar-projetos";
 import { useNavigate } from "react-router";
 import { WidgetLoading } from "../widget-loading/WidgetLoading";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertTriangle, ExternalLink, Package, Trash } from "lucide-react";
+import { AlertTriangle, ExternalLink, Loader2Icon, Package, Trash } from "lucide-react";
 import dayjs from "dayjs";
 import { Button } from "@/components/ui/button";
+import { useDeletarProjeto } from "@/application/hooks/useDeletarProjeto";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 export function WidgetListarProjetos() {
 
     const navigate = useNavigate();
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const queryClient = useQueryClient();
 
     const {
         data: projetosList,
         isLoading: isLoadingProjetosList,
     } = useListarProjetos();
+
+    const {
+        mutate: mutateDeletarProjeto,
+        isPending: isPendingDeletarProjeto,
+    } = useDeletarProjeto();
 
     if (isLoadingProjetosList) {
         return (
@@ -44,14 +55,62 @@ export function WidgetListarProjetos() {
                                 <p className="text-zinc-400">{dayjs(projeto.atualizado_em).format('DD/MM/YYYY HH:mm:ss')}</p>
                             </CardContent>
                             <CardFooter className="flex gap-2 justify-between items-center">
-                                <Button onClick={() => navigate(`/projetos/${projeto.id}`)} className="cursor-pointer bg-emerald-500 hover:bg-emerald-600">
+                                <Button onClick={() => {
+                                    navigate(`/projetos/${projeto.id}`);
+                                }} className="cursor-pointer bg-emerald-500 hover:bg-emerald-600">
                                     Ver
                                     <ExternalLink />
                                 </Button>
-                                <Button className="w-fit cursor-pointer bg-red-500 hover:bg-red-600">
-                                    Apagar
-                                    <Trash />
-                                </Button>
+                                <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                                    <DialogTrigger>
+                                        <Button className="w-fit cursor-pointer bg-red-500 hover:bg-red-600">
+                                            <div className="flex items-center gap-2">
+                                                <p>Apagar</p>
+                                                <Trash />
+                                            </div>
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent>
+                                        <DialogHeader>
+                                            <DialogTitle>Você tem certeza?</DialogTitle>
+                                            <DialogDescription>
+                                                Todos os seus boards neste projeto serão deletados!
+                                            </DialogDescription>
+                                        </DialogHeader>
+                                        <DialogFooter>
+                                            <DialogClose asChild>
+                                                <Button variant={'link'}>Voltar</Button>
+                                            </DialogClose>
+                                            <Button onClick={() => {
+                                                mutateDeletarProjeto({
+                                                    id: projeto.id
+                                                }, {
+                                                    onSuccess: () => {
+                                                        queryClient.invalidateQueries({
+                                                            queryKey: ['get-listar-projetos']
+                                                        });
+                                                        setDialogOpen(false);
+                                                    },
+                                                    onError: () => {
+                                                        setDialogOpen(false);
+                                                    }
+                                                });
+                                            }} disabled={isPendingDeletarProjeto} className="w-fit cursor-pointer bg-red-500 hover:bg-red-600">
+                                                {isPendingDeletarProjeto ? (
+                                                    <div className="flex items-center gap-2">
+                                                        <p>Apagando...</p>
+                                                        <Loader2Icon className="animate-spin" />
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex items-center gap-2">
+                                                        <p>Apagar</p>
+                                                        <Trash />
+                                                    </div>
+                                                )}
+                                            </Button>
+                                        </DialogFooter>
+                                    </DialogContent>
+                                </Dialog>
                             </CardFooter>
                         </Card>
                     );

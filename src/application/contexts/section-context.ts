@@ -14,7 +14,8 @@ type SectionContextType = {
     sections: SectionType[];
     handleDragSection: (data: any) => void;
     sections_count: number;
-    cards_count: number;
+    tasks_active: number;
+    tasks_finished: number;
 }
 
 export const SectionContext = createContext<SectionContextType>({} as SectionContextType);
