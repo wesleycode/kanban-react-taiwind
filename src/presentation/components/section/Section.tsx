@@ -99,7 +99,7 @@ export function Section({
     return (
         <div
             ref={ref}
-            className={'flex flex-col p-3 rounded-md bg-zinc-200 min-h-[600px] min-w-[300px] transition-colors'}
+            className={'flex flex-col p-3 rounded-md bg-zinc-200 min-h-[600px] w-full max-w-[300px] transition-colors'}
         >
             <div className="flex w-full items-center justify-between gap-3 flex-wrap">
                 <h3 className='text-md text-zinc-900 font-bold uppercase mb-2'>{title} ({cards.length})</h3>
@@ -138,7 +138,7 @@ export function Section({
                     </DialogContent>
                 </Dialog>
             </div>
-            <div className="flex-1">
+            <div className="flex flex-col gap-2 items-center">
                 {cards.map((card) => (
                     <Card
                         key={card.id}

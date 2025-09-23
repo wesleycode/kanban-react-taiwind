@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import dayjs from "dayjs";
 import { WidgetTimingSection } from "../widgets/widget-timing-section/WidgetTimingSection";
-import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
+import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
@@ -46,25 +46,25 @@ export function Card({
 
   return (
     <Drawer direction="right" open={openDrawer} onOpenChange={onOpenDrawer}>
-      <Button onClick={() => onOpenDrawer(true)} className="bg-zinc-300 hover:bg-zinc-400" asChild>
+      <Button onClick={() => onOpenDrawer(true)} className="bg-zinc-300 hover:bg-zinc-400 w-full" asChild>
         <div
           ref={ref}
-          className={`group relative h-fit p-3 mt-3 rounded-md cursor-move transition-opacity ${isDragging ? 'opacity-50' : 'opacity-100'}`}
+          className={`h-fit p-3 mt-3 rounded-md cursor-move transition-opacity ${isDragging ? 'opacity-50' : 'opacity-100'}`}
         >
-          <div className='flex items-center justify-between text-zinc-900'>
-            <div className="flex-1">
+          <div className='flex items-center justify-between text-zinc-900 w-full'>
+            <div className="flex flex-col w-full">
               <div className="flex items-center gap-2">
                 <GripVertical size={16} className="text-zinc-500" />
-                <h3 className='uppercase font-bold text-sm'>{title.length > 5 ? title.substring(0, 5).concat('...') : title}</h3>
+                <h3 className='uppercase font-bold text-sm truncate'>{title}</h3>
               </div>
               <div className="flex text-xs flex-col gap-3 ml-6">
-                <p className='text-zinc-600'>{description.length > 5 ? description.substring(0, 5).concat('...') : description}</p>
-                <div className="flex items-center justify-between gap-3 flex-wrap">
-                  <p className="text-zinc-600">Entregar em - {dayjs(expires_at, 'DD/MM/YYYY HH:mm:ss').format('DD/MM/YYYY - HH:mm:ss')}</p>
-                  <WidgetTimingSection
-                    expires_at={expires_at}
-                  />
+                <div className="flex flex-col gap-1">
+                  <p className='text-zinc-600 truncate'>{description}</p>
+                  <p className="text-zinc-600 truncate">Entregar em - {dayjs(expires_at, 'DD/MM/YYYY HH:mm:ss').format('DD/MM/YYYY - HH:mm:ss')}</p>
                 </div>
+                <WidgetTimingSection
+                  expires_at={expires_at}
+                />
               </div>
             </div>
           </div>

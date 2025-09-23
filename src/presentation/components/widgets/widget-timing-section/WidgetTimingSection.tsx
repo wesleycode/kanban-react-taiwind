@@ -14,11 +14,20 @@ export function WidgetTimingSection({
     return (
         <div className="flex gap-2">
             {isExpired ? (
-                <AlertCircle size={13} className="text-red-500" />
+                <div className="flex gap-2 text-red-500">
+                    <p className="text-zinc-500 font-normal">Status: atrasada</p>
+                    <AlertCircle size={13} />
+                </div>
             ) : isOneDayLeft ? (
-                <AlertTriangle size={13} className="text-yellow-500" />
+                <div className="flex gap-2 text-yellow-500">
+                    <p className="text-zinc-500 font-normal">Status: em breve</p>
+                    <AlertTriangle size={13}/>
+                </div>
             ) : (
-                <CheckCircle size={13} className="text-green-500" />
+                <div className="flex gap-2 text-green-500">
+                    <p className="text-zinc-500 font-normal">Status: dentro do Prazo</p>
+                    <CheckCircle size={13} />
+                </div>
             )}
         </div>
     );

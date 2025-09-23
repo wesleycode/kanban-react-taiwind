@@ -10,7 +10,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
-import { WidgetResumoProjeto } from "../components/widgets/widget-resumo-projeto";
+import { WidgetResumoProjeto } from "../components/widgets/widget-resumo-projeto/widget-resumo-projeto";
 import { Navigate, useNavigate, useParams } from "react-router";
 import { RoutesConstants } from "@/application/constants/RoutesConstants";
 
